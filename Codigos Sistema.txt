@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Acadêmico Universitário</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .menu-item {
+            justify-content: center;
+        }
+        .content-area {
+            transition: all 0.3s ease;
+        }
+        .content-area.expanded {
+            margin-left: 70px;
+        }
+        .active-menu {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .active-menu:hover {
+            background-color: #3b82f6 !important;
+            color: white !important;
+        }
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .dropdown-content.show {
+            max-height: 1000px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-blue-800 text-white w-64 flex flex-col fixed h-full z-50">
+            <!-- Logo -->
+            <div class="p-4 flex items-center space-x-2 border-b border-blue-700">
+                <i class="fas fa-university text-2xl"></i>
+                <span class="logo-text text-xl font-bold">UniSystem</span>
+            </div>
+            
+            <!-- User Profile -->
+            <div class="p-4 flex items-center space-x-3 border-b border-blue-700">
+                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="sidebar-text">
+                    <div class="font-medium">Admin</div>
+                    <div class="text-xs text-blue-200">Administrador</div>
+                </div>
+            </div>
+            
+            <!-- Menu -->
+            <div class="flex-1 overflow-y-auto py-4">
+                <!-- Gestão de Usuários -->
+                <div class="menu-group">
+                    <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="toggleDropdown('users-dropdown')">
+                        <i class="fas fa-users w-6 text-center"></i>
+                        <span class="sidebar-text ml-2">Gestão de Usuários</span>
+                        <i class="fas fa-chevron-down ml-auto sidebar-text text-xs transition-transform duration-300" id="users-arrow"></i>
+                    </div>
+                    <div class="dropdown-content" id="users-dropdown">
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('student-registration')">
+                            <i class="fas fa-user-graduate w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Cadastro de alunos</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('teacher-registration')">
+                            <i class="fas fa-chalkboard-teacher w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Cadastro de professores</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('staff-registration')">
+                            <i class="fas fa-user-tie w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Cadastro de funcionários</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('permissions')">
+                            <i class="fas fa-key w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Perfis e permissões</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gestão Acadêmica -->
+                <div class="menu-group">
+                    <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="toggleDropdown('academic-dropdown')">
+                        <i class="fas fa-book w-6 text-center"></i>
+                        <span class="sidebar-text ml-2">Gestão Acadêmica</span>
+                        <i class="fas fa-chevron-down ml-auto sidebar-text text-xs transition-transform duration-300" id="academic-arrow"></i>
+                    </div>
+                    <div class="dropdown-content" id="academic-dropdown">
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('courses')">
+                            <i class="fas fa-graduation-cap w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Cursos</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('subjects')">
+                            <i class="fas fa-book-open w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Disciplinas</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('curriculum')">
+                            <i class="fas fa-layer-group w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Estrutura curricular</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('classes')">
+                            <i class="fas fa-users-class w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Turmas</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Matrícula -->
+                <div class="menu-group">
+                    <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="toggleDropdown('enrollment-dropdown')">
+                        <i class="fas fa-clipboard-list w-6 text-center"></i>
+                        <span class="sidebar-text ml-2">Matrícula</span>
+                        <i class="fas fa-chevron-down ml-auto sidebar-text text-xs transition-transform duration-300" id="enrollment-arrow"></i>
+                    </div>
+                    <div class="dropdown-content" id="enrollment-dropdown">
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('initial-enrollment')">
+                            <i class="fas fa-user-plus w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Matrícula inicial</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('re-enrollment')">
+                            <i class="fas fa-redo w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Rematrícula</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('cancel-enrollment')">
+                            <i class="fas fa-user-minus w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Cancelamento</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('subject-request')">
+                            <i class="fas fa-hand-paper w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Solicitação de vaga</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Avaliações e Notas -->
+                <div class="menu-group">
+                    <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="toggleDropdown('grades-dropdown')">
+                        <i class="fas fa-chart-bar w-6 text-center"></i>
+                        <span class="sidebar-text ml-2">Avaliações e Notas</span>
+                        <i class="fas fa-chevron-down ml-auto sidebar-text text-xs transition-transform duration-300" id="grades-arrow"></i>
+                    </div>
+                    <div class="dropdown-content" id="grades-dropdown">
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('grade-entry')">
+                            <i class="fas fa-edit w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Lançamento de notas</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('attendance')">
+                            <i class="fas fa-calendar-check w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Faltas e frequência</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('recovery')">
+                            <i class="fas fa-sync-alt w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Recuperações</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Calendário Acadêmico -->
+                <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="loadContent('calendar')">
+                    <i class="fas fa-calendar-alt w-6 text-center"></i>
+                    <span class="sidebar-text ml-2">Calendário Acadêmico</span>
+                </div>
+                
+                <!-- Financeiro -->
+                <div class="menu-group">
+                    <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="toggleDropdown('financial-dropdown')">
+                        <i class="fas fa-money-bill-wave w-6 text-center"></i>
+                        <span class="sidebar-text ml-2">Financeiro</span>
+                        <i class="fas fa-chevron-down ml-auto sidebar-text text-xs transition-transform duration-300" id="financial-arrow"></i>
+                    </div>
+                    <div class="dropdown-content" id="financial-dropdown">
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('tuition')">
+                            <i class="fas fa-file-invoice-dollar w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Mensalidades</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('delinquency')">
+                            <i class="fas fa-exclamation-triangle w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Inadimplência</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('scholarships')">
+                            <i class="fas fa-award w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Bolsas e descontos</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Documentos e Histórico -->
+                <div class="menu-group">
+                    <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="toggleDropdown('documents-dropdown')">
+                        <i class="fas fa-file-alt w-6 text-center"></i>
+                        <span class="sidebar-text ml-2">Documentos</span>
+                        <i class="fas fa-chevron-down ml-auto sidebar-text text-xs transition-transform duration-300" id="documents-arrow"></i>
+                    </div>
+                    <div class="dropdown-content" id="documents-dropdown">
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('transcript')">
+                            <i class="fas fa-scroll w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Histórico escolar</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('enrollment-cert')">
+                            <i class="fas fa-file-certificate w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Declaração de matrícula</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('diplomas')">
+                            <i class="fas fa-certificate w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Diplomas e certificados</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Biblioteca -->
+                <div class="menu-group">
+                    <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="toggleDropdown('library-dropdown')">
+                        <i class="fas fa-book-reader w-6 text-center"></i>
+                        <span class="sidebar-text ml-2">Biblioteca</span>
+                        <i class="fas fa-chevron-down ml-auto sidebar-text text-xs transition-transform duration-300" id="library-arrow"></i>
+                    </div>
+                    <div class="dropdown-content" id="library-dropdown">
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('book-loans')">
+                            <i class="fas fa-exchange-alt w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Empréstimo e devolução</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('catalog')">
+                            <i class="fas fa-search w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Catálogo de obras</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('reservations')">
+                            <i class="fas fa-bookmark w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Reservas e multas</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Estágios e TCC -->
+                <div class="menu-group">
+                    <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="toggleDropdown('internship-dropdown')">
+                        <i class="fas fa-briefcase w-6 text-center"></i>
+                        <span class="sidebar-text ml-2">Estágios e TCC</span>
+                        <i class="fas fa-chevron-down ml-auto sidebar-text text-xs transition-transform duration-300" id="internship-arrow"></i>
+                    </div>
+                    <div class="dropdown-content" id="internship-dropdown">
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('tcc')">
+                            <i class="fas fa-file-contract w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Submissão de TCC</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('internship')">
+                            <i class="fas fa-user-clock w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Acompanhamento</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('advisors')">
+                            <i class="fas fa-chalkboard-teacher w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Designação de orientadores</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Relatórios -->
+                <div class="menu-group">
+                    <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="toggleDropdown('reports-dropdown')">
+                        <i class="fas fa-chart-pie w-6 text-center"></i>
+                        <span class="sidebar-text ml-2">Relatórios</span>
+                        <i class="fas fa-chevron-down ml-auto sidebar-text text-xs transition-transform duration-300" id="reports-arrow"></i>
+                    </div>
+                    <div class="dropdown-content" id="reports-dropdown">
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('course-reports')">
+                            <i class="fas fa-graduation-cap w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Por curso</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('subject-reports')">
+                            <i class="fas fa-book-open w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Por disciplina</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('performance-reports')">
+                            <i class="fas fa-chart-line w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Desempenho</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Portais -->
+                <div class="menu-group">
+                    <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="toggleDropdown('portals-dropdown')">
+                        <i class="fas fa-laptop w-6 text-center"></i>
+                        <span class="sidebar-text ml-2">Portais</span>
+                        <i class="fas fa-chevron-down ml-auto sidebar-text text-xs transition-transform duration-300" id="portals-arrow"></i>
+                    </div>
+                    <div class="dropdown-content" id="portals-dropdown">
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('student-portal')">
+                            <i class="fas fa-user-graduate w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Portal do Aluno</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('teacher-portal')">
+                            <i class="fas fa-chalkboard-teacher w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Portal do Professor</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('coordination-portal')">
+                            <i class="fas fa-user-tie w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Portal da Coordenação</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Integrações -->
+                <div class="menu-group">
+                    <div class="menu-item flex items-center p-3 hover:bg-blue-700 cursor-pointer" onclick="toggleDropdown('integrations-dropdown')">
+                        <i class="fas fa-plug w-6 text-center"></i>
+                        <span class="sidebar-text ml-2">Integrações</span>
+                        <i class="fas fa-chevron-down ml-auto sidebar-text text-xs transition-transform duration-300" id="integrations-arrow"></i>
+                    </div>
+                    <div class="dropdown-content" id="integrations-dropdown">
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('library-integration')">
+                            <i class="fas fa-book w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Sistema de biblioteca</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('payment-integration')">
+                            <i class="fas fa-credit-card w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">Sistema de pagamentos</span>
+                        </div>
+                        <div class="submenu-item pl-12 p-2 hover:bg-blue-700 cursor-pointer" onclick="loadContent('mec-integration')">
+                            <i class="fas fa-landmark w-4 text-center"></i>
+                            <span class="sidebar-text ml-2">MEC e e-MEC</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Collapse Button -->
+            <div class="p-4 border-t border-blue-700 flex items-center justify-center">
+                <button class="text-blue-200 hover:text-white" onclick="toggleSidebar()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content-area flex-1 flex flex-col overflow-hidden ml-64">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm z-40">
+                <div class="flex items-center justify-between px-6 py-3">
+                    <div class="flex items-center">
+                        <button class="text-gray-500 hover:text-gray-600 mr-4" onclick="toggleSidebar()">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="text-xl font-semibold text-gray-800" id="page-title">Dashboard</h1>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button class="text-gray-500 hover:text-gray-600">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <button class="text-gray-500 hover:text-gray-600">
+                                <i class="fas fa-envelope"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-blue-500"></span>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <button class="flex items-center space-x-2" onclick="toggleUserDropdown()">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <i class="fas fa-user text-blue-600"></i>
+                                </div>
+                                <span class="hidden md:inline text-gray-700">Admin</span>
+                                <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden z-50" id="user-dropdown">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Perfil</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configurações</a>
+                                <div class="border-t border-gray-200"></div>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+                <!-- Dashboard Content -->
+                <div id="dashboard-content" class="tab-content active animate-fade-in">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <!-- Card 1 -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Total de Alunos</p>
+                                    <h3 class="text-2xl font-bold">1,248</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                    <i class="fas fa-user-graduate text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="text-green-500 text-sm font-semibold">+12%</span>
+                                <span class="text-gray-500 text-sm ml-2">vs último semestre</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 2 -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Total de Professores</p>
+                                    <h3 class="text-2xl font-bold">87</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                    <i class="fas fa-chalkboard-teacher text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="text-green-500 text-sm font-semibold">+5%</span>
+                                <span class="text-gray-500 text-sm ml-2">vs último semestre</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 3 -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Turmas Ativas</p>
+                                    <h3 class="text-2xl font-bold">56</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                                    <i class="fas fa-users-class text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="text-green-500 text-sm font-semibold">+8%</span>
+                                <span class="text-gray-500 text-sm ml-2">vs último semestre</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 4 -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Inadimplência</p>
+                                    <h3 class="text-2xl font-bold">14%</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                    <i class="fas fa-exclamation-triangle text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="text-red-500 text-sm font-semibold">-3%</span>
+                                <span class="text-gray-500 text-sm ml-2">vs último mês</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity and Calendar -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Recent Activity -->
+                        <div class="lg:col-span-2 bg-white rounded-lg shadow">
+                            <div class="p-5 border-b border-gray-200">
+                                <h3 class="text-lg font-semibold">Atividades Recentes</h3>
+                            </div>
+                            <div class="p-5">
+                                <div class="space-y-4">
+                                    <!-- Activity 1 -->
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 mt-1">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                                <i class="fas fa-user-plus"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">Novo aluno matriculado</p>
+                                            <p class="text-sm text-gray-500">João Silva matriculado no curso de Engenharia Civil</p>
+                                            <p class="text-xs text-gray-400 mt-1">2 horas atrás</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Activity 2 -->
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 mt-1">
+                                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                                <i class="fas fa-book"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">Nova disciplina criada</p>
+                                            <p class="text-sm text-gray-500">Disciplina "Inteligência Artificial" adicionada ao curso de Ciência da Computação</p>
+                                            <p class="text-xs text-gray-400 mt-1">Ontem, 15:30</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Activity 3 -->
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 mt-1">
+                                            <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">Aviso de inadimplência</p>
+                                            <p class="text-sm text-gray-500">5 alunos com mensalidades atrasadas há mais de 30 dias</p>
+                                            <p class="text-xs text-gray-400 mt-1">Ontem, 10:15</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Activity 4 -->
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 mt-1">
+                                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                                                <i class="fas fa-chalkboard-teacher"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">Novo professor contratado</p>
+                                            <p class="text-sm text-gray-500">Prof. Maria Oliveira contratada para o departamento de Matemática</p>
+                                            <p class="text-xs text-gray-400 mt-1">3 dias atrás</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Calendar -->
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-5 border-b border-gray-200">
+                                <h3 class="text-lg font-semibold">Calendário Acadêmico</h3>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="text-md font-medium">Junho 2023</h4>
+                                    <div class="flex space-x-2">
+                                        <button class="p-1 rounded-full hover:bg-gray-100">
+                                            <i class="fas fa-chevron-left text-gray-500"></i>
+                                        </button>
+                                        <button class="p-1 rounded-full hover:bg-gray-100">
+                                            <i class="fas fa-chevron-right text-gray-500"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-7 gap-1 mb-2">
+                                    <div class="text-center text-xs font-medium text-gray-500">Dom</div>
+                                    <div class="text-center text-xs font-medium text-gray-500">Seg</div>
+                                    <div class="text-center text-xs font-medium text-gray-500">Ter</div>
+                                    <div class="text-center text-xs font-medium text-gray-500">Qua</div>
+                                    <div class="text-center text-xs font-medium text-gray-500">Qui</div>
+                                    <div class="text-center text-xs font-medium text-gray-500">Sex</div>
+                                    <div class="text-center text-xs font-medium text-gray-500">Sáb</div>
+                                </div>
+                                
+                                <div class="grid grid-cols-7 gap-1">
+                                    <div class="h-8 text-center text-sm text-gray-400">28</div>
+                                    <div class="h-8 text-center text-sm text-gray-400">29</div>
+                                    <div class="h-8 text-center text-sm text-gray-400">30</div>
+                                    <div class="h-8 text-center text-sm text-gray-400">31</div>
+                                    <div class="h-8 text-center text-sm">1</div>
+                                    <div class="h-8 text-center text-sm">2</div>
+                                    <div class="h-8 text-center text-sm">3</div>
+                                    <div class="h-8 text-center text-sm">4</div>
+                                    <div class="h-8 text-center text-sm">5</div>
+                                    <div class="h-8 text-center text-sm">6</div>
+                                    <div class="h-8 text-center text-sm">7</div>
+                                    <div class="h-8 text-center text-sm">8</div>
+                                    <div class="h-8 text-center text-sm">9</div>
+                                    <div class="h-8 text-center text-sm">10</div>
+                                    <div class="h-8 text-center text-sm">11</div>
+                                    <div class="h-8 text-center text-sm">12</div>
+                                    <div class="h-8 text-center text-sm">13</div>
+                                    <div class="h-8 text-center text-sm">14</div>
+                                    <div class="h-8 text-center text-sm">15</div>
+                                    <div class="h-8 text-center text-sm">16</div>
+                                    <div class="h-8 text-center text-sm">17</div>
+                                    <div class="h-8 text-center text-sm">18</div>
+                                    <div class="h-8 text-center text-sm">19</div>
+                                    <div class="h-8 text-center text-sm bg-blue-100 rounded-full text-blue-600 font-medium">20</div>
+                                    <div class="h-8 text-center text-sm">21</div>
+                                    <div class="h-8 text-center text-sm">22</div>
+                                    <div class="h-8 text-center text-sm">23</div>
+                                    <div class="h-8 text-center text-sm">24</div>
+                                    <div class="h-8 text-center text-sm">25</div>
+                                    <div class="h-8 text-center text-sm">26</div>
+                                    <div class="h-8 text-center text-sm">27</div>
+                                    <div class="h-8 text-center text-sm">28</div>
+                                    <div class="h-8 text-center text-sm">29</div>
+                                    <div class="h-8 text-center text-sm">30</div>
+                                    <div class="h-8 text-center text-sm text-gray-400">1</div>
+                                    <div class="h-8 text-center text-sm text-gray-400">2</div>
+                                    <div class="h-8 text-center text-sm text-gray-400">3</div>
+                                    <div class="h-8 text-center text-sm text-gray-400">4</div>
+                                </div>
+                                
+                                <div class="mt-6 space-y-3">
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 rounded-full bg-blue-500 mr-2"></div>
+                                        <span class="text-xs text-gray-600">Início das matrículas - 20/06</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                                        <span class="text-xs text-gray-600">Período de provas - 10/07 a 15/07</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 rounded-full bg-red-500 mr-2"></div>
+                                        <span class="text-xs text-gray-600">Férias acadêmicas - 20/07 a 05/08</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Student Registration Content -->
+                <div id="student-registration-content" class="tab-content animate-fade-in">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-semibold">Cadastro de Alunos</h2>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Novo Aluno
+                            </button>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                                <div class="relative mb-4 md:mb-0 md:w-64">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                    <input type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Buscar aluno...">
+                                </div>
+                                
+                                <div class="flex space-x-2">
+                                    <div class="relative">
+                                        <select class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option>Filtrar por curso</option>
+                                            <option>Engenharia Civil</option>
+                                            <option>Ciência da Computação</option>
+                                            <option>Administração</option>
+                                            <option>Direito</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="relative">
+                                        <select class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                            <option>Filtrar por status</option>
+                                            <option>Ativo</option>
+                                            <option>Inativo</option>
+                                            <option>Trancado</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matrícula</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Curso</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Período</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">20230001</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">João Silva</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Engenharia Civil</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4º</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Ativo</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">20230002</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Maria Oliveira</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Ciência da Computação</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2º</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Ativo</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">20220045</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Carlos Souza</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Administração</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">6º</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Trancado</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">20210078</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Ana Santos</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Direito</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8º</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Inativo</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">20230123</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Pedro Costa</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Engenharia Civil</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1º</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Ativo</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-6 flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                Mostrando <span class="font-medium">1</span> a <span class="font-medium">5</span> de <span class="font-medium">1248</span> alunos
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                    Anterior
+                                </button>
+                                <button class="px-3 py-1 border border-blue-500 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                                    1
+                                </button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                    2
+                                </button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                    3
+                                </button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                    Próximo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Teacher Registration Content -->
+                <div id="teacher-registration-content" class="tab-content animate-fade-in">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-semibold">Cadastro de Professores</h2>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Novo Professor
+                            </button>
+                        </div>
+                        
+                        <!-- Similar table structure as student registration -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departamento</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titulação</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">PROF001</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Dr. Roberto Almeida</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Engenharia</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Doutorado</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Ativo</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <!-- More rows... -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Courses Content -->
+                <div id="courses-content" class="tab-content animate-fade-in">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-semibold">Gestão de Cursos</h2>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Novo Curso
+                            </button>
+                        </div>
+                        
+                        <!-- Course cards grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Course Card 1 -->
+                            <div class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                                <div class="bg-blue-600 p-4 text-white">
+                                    <h3 class="font-semibold text-lg">Engenharia Civil</h3>
+                                    <p class="text-sm opacity-90">Bacharelado - 10 semestres</p>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span class="text-gray-600">Coordenador:</span>
+                                        <span class="font-medium">Prof. Dr. Carlos Mendes</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span class="text-gray-600">Alunos:</span>
+                                        <span class="font-medium">248</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm mb-4">
+                                        <span class="text-gray-600">Status:</span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Ativo</span>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button class="flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 py-1 px-3 rounded text-sm flex items-center justify-center">
+                                            <i class="fas fa-edit mr-1"></i> Editar
+                                        </button>
+                                        <button class="flex-1 bg-gray-50 text-gray-600 hover:bg-gray-100 py-1 px-3 rounded text-sm flex items-center justify-center">
+                                            <i class="fas fa-eye mr-1"></i> Ver
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Course Card 2 -->
+                            <div class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                                <div class="bg-green-600 p-4 text-white">
+                                    <h3 class="font-semibold text-lg">Ciência da Computação</h3>
+                                    <p class="text-sm opacity-90">Bacharelado - 8 semestres</p>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span class="text-gray-600">Coordenador:</span>
+                                        <span class="font-medium">Prof. Dra. Ana Silva</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span class="text-gray-600">Alunos:</span>
+                                        <span class="font-medium">312</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm mb-4">
+                                        <span class="text-gray-600">Status:</span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Ativo</span>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button class="flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 py-1 px-3 rounded text-sm flex items-center justify-center">
+                                            <i class="fas fa-edit mr-1"></i> Editar
+                                        </button>
+                                        <button class="flex-1 bg-gray-50 text-gray-600 hover:bg-gray-100 py-1 px-3 rounded text-sm flex items-center justify-center">
+                                            <i class="fas fa-eye mr-1"></i> Ver
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Course Card 3 -->
+                            <div class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                                <div class="bg-purple-600 p-4 text-white">
+                                    <h3 class="font-semibold text-lg">Administração</h3>
+                                    <p class="text-sm opacity-90">Bacharelado - 8 semestres</p>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span class="text-gray-600">Coordenador:</span>
+                                        <span class="font-medium">Prof. Dr. Marcos Oliveira</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span class="text-gray-600">Alunos:</span>
+                                        <span class="font-medium">187</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm mb-4">
+                                        <span class="text-gray-600">Status:</span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Ativo</span>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button class="flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 py-1 px-3 rounded text-sm flex items-center justify-center">
+                                            <i class="fas fa-edit mr-1"></i> Editar
+                                        </button>
+                                        <button class="flex-1 bg-gray-50 text-gray-600 hover:bg-gray-100 py-1 px-3 rounded text-sm flex items-center justify-center">
+                                            <i class="fas fa-eye mr-1"></i> Ver
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Grades Content -->
+                <div id="grades-content" class="tab-content animate-fade-in">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-semibold">Lançamento de Notas</h2>
+                            <div class="flex space-x-2">
+                                <div class="relative">
+                                    <select class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        <option>Selecione o curso</option>
+                                        <option>Engenharia Civil</option>
+                                        <option>Ciência da Computação</option>
+                                        <option>Administração</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                                <div class="relative">
+                                    <select class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        <option>Selecione a disciplina</option>
+                                        <option>Cálculo I</option>
+                                        <option>Programação I</option>
+                                        <option>Gestão Financeira</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                                <div class="relative">
+                                    <select class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        <option>Selecione a turma</option>
+                                        <option>Turma A - 2023.1</option>
+                                        <option>Turma B - 2023.1</option>
+                                        <option>Turma C - 2023.1</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matrícula</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aluno</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faltas</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nota 1</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nota 2</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nota 3</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Média</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">20230001</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">João Silva</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <input type="number" class="w-16 p-1 border border-gray-300 rounded" value="2">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <input type="number" step="0.1" class="w-16 p-1 border border-gray-300 rounded" value="8.5">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <input type="number" step="0.1" class="w-16 p-1 border border-gray-300 rounded" value="7.0">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <input type="number" step="0.1" class="w-16 p-1 border border-gray-300 rounded" value="">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">7.8</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aprovado</span>
+                                        </td>
+                                    </tr>
+                                    <!-- More rows... -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-6 flex justify-end">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center">
+                                <i class="fas fa-save mr-2"></i> Salvar Notas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Calendar Content -->
+                <div id="calendar-content" class="tab-content animate-fade-in">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-semibold">Calendário Acadêmico</h2>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Novo Evento
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Calendar -->
+                            <div class="lg:col-span-2">
+                                <div class="bg-white rounded-lg shadow-sm p-4">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h3 class="text-lg font-medium">Junho 2023</h3>
+                                        <div class="flex space-x-2">
+                                            <button class="p-2 rounded-full hover:bg-gray-100">
+                                                <i class="fas fa-chevron-left text-gray-600"></i>
+                                            </button>
+                                            <button class="p-2 rounded-full hover:bg-gray-100">
+                                                <i class="fas fa-chevron-right text-gray-600"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-7 gap-1 mb-2">
+                                        <div class="text-center text-xs font-medium text-gray-500">Dom</div>
+                                        <div class="text-center text-xs font-medium text-gray-500">Seg</div>
+                                        <div class="text-center text-xs font-medium text-gray-500">Ter</div>
+                                        <div class="text-center text-xs font-medium text-gray-500">Qua</div>
+                                        <div class="text-center text-xs font-medium text-gray-500">Qui</div>
+                                        <div class="text-center text-xs font-medium text-gray-500">Sex</div>
+                                        <div class="text-center text-xs font-medium text-gray-500">Sáb</div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-7 gap-1">
+                                        <!-- Calendar days with events -->
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">28</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">29</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">30</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">31</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">1</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">2</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">3</div>
+                                        </div>
+                                        <!-- More days... -->
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">4</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">5</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">6</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">7</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">8</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">9</div>
+                                        </div>
+                                        <div class="h-24 p-1 border border-gray-100">
+                                            <div class="text-right text-sm">10</div>
+                                        </div>
+                                        <!-- Highlighted day with event -->
+                                        <div class="h-24 p-1 border border-gray-100 bg-blue-50">
+                                            <div class="text-right text-sm font-medium text-blue-600">20</div>
+                                            <div class="text-xs mt-1 p-1 bg-blue-100 text-blue-800 rounded">Início matrículas</div>
+                                        </div>
+                                        <!-- More days... -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Upcoming Events -->
+                            <div>
+                                <div class="bg-white rounded-lg shadow-sm p-4">
+                                    <h3 class="text-lg font-medium mb-4">Próximos Eventos</h3>
+                                    
+                                    <div class="space-y-4">
+                                        <!-- Event 1 -->
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0 mt-1">
+                                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                                    <i class="fas fa-calendar-day text-sm"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-900">Início das matrículas</p>
+                                                <p class="text-sm text-gray-500">20 de Junho de 2023</p>
+                                                <p class="text-xs text-gray-400 mt-1">Período letivo 2023.2</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Event 2 -->
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0 mt-1">
+                                                <div class
+</html>
